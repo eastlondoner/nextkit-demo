@@ -1,16 +1,21 @@
-import {api, HttpException, InferAPIResponseType} from 'nextkit';
+import type { InferAPIResponseType, APIResponse } from 'nextkit';
+import { api, HttpException } from 'nextkit';
 
-const handler = api<{time: number}>({
+export function doHello(failureRate: number) {
+	if (Math.random() < failureRate) {
+		throw new HttpException(500, 'This was intentionally thrown.');
+	}
+
+	return {
+		time: Date.now(),
+	};
+}
+
+const handler = api<{ time: number }>({
 	async GET() {
-		if (Math.random() > 0.7) {
-			throw new HttpException(500, 'This was intentionally thrown.');
-		}
-
-		return {
-			time: Date.now(),
-		};
+		return doHello(0.3);
 	},
 });
 
 export default handler;
-export type HandlerResponse = InferAPIResponseType<typeof handler>;
+export type HelloResponse = InferAPIResponseType<typeof handler>;
