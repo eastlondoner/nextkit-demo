@@ -1,21 +1,14 @@
-import type { InferAPIResponseType, APIResponse } from 'nextkit';
 import { api, HttpException } from 'nextkit';
+import { withFailures } from '../../utils/withFailures';
+import helloService from '../../services/hello'
 
-export function doHello(failureRate: number) {
-	if (Math.random() < failureRate) {
-		throw new HttpException(500, 'This was intentionally thrown.');
-	}
-
-	return {
-		time: Date.now(),
-	};
-}
+const serverFailureRate = process.env.NEXT_PRIVATE_SERVER_SIDE_FAILURE_RATE ? parseFloat(process.env.NEXT_PRIVATE_SERVER_SIDE_FAILURE_RATE) : 0.0;
+export const serverSideHello = serverFailureRate > 0.0 ? withFailures(serverFailureRate, () => new HttpException(500, 'This was intentionally thrown.'), helloService.doHello) : helloService.doHello
 
 const handler = api<{ time: number }>({
 	async GET() {
-		return doHello(0.3);
+		return serverSideHello();
 	},
 });
 
 export default handler;
-export type HelloResponse = InferAPIResponseType<typeof handler>;

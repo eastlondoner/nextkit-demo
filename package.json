@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NEXT_PUBLIC_CLIENT_SIDE_FETCH_DELAY=4000 NEXT_PRIVATE_SERVER_SIDE_FAILURE_RATE=0.3 next dev",
     "build": "next build",
     "start": "next start"
   },
